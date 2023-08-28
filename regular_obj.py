@@ -244,11 +244,9 @@ class Face:
   def area(self):
     """Returns the total area of the Face object."""
     verts = self.bound.get_loop()
-    pivot = verts[0]
-    
     total_area = 0
     for i in range(1, len(verts)-1):
-      total_area += self._tri_area(pivot, verts[i], verts[i+1])
+      total_area += self._tri_area(verts[0], verts[i], verts[i+1])
     return total_area
 
   def contains(self, v):
