@@ -1,6 +1,6 @@
 # Parallel Plane Analyzer for STEP Files
 
-This Python program allows us to analyze and explore parallel planes within STEP files. It uses the `steptools` library for working with STEP files, while enabling us to extract, categorize, and do numerical operations with 3D objects taken from the file.
+HI EVERYONE! I wrote this program that allows us to analyze and explore objects within STEP files. It uses the `steptools` library for working with STEP files, while enabling us to extract, categorize, and do numerical operations with 3D objects taken from the file.
 
 ## Features
 
