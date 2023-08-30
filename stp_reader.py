@@ -33,6 +33,9 @@ def display_all_objects(objects):
 
 class STPFile:
   """Stores an STP file."""
+  unreadable = []
+  unreadable_types = set()
+
   def __init__(self, file_path=None):
     """Initializes an STPFile object."""
     if file_path is not None:
@@ -66,8 +69,11 @@ class STPFile:
       return edges
     
     if step.type(obj) == 'advanced_face':
+      try:
+        bound = Bound(get_edges(obj))
+      except Exception as e:
+        print('BOUND ERROR!!!')
       plane = Plane(*get_plane_attr(obj))
-      bound = Bound(get_edges(obj))
       return Face(plane, bound)
 
     if step.type(obj) == 'vertex_point':
@@ -76,6 +82,15 @@ class STPFile:
   
     return None
 
+  @staticmethod
+  def print_errors():
+    """Prints all objects that had error being read."""
+    if len(STPFile.unreadable):
+      print(f'- Out of all faces, {len(STPFile.unreadable)} are '+
+          f'unreadable, with formats {STPFile.unreadable_types}.') 
+    else:
+      print('All faces are readable.')
+
   def get_3D_objects(self, types=None):
     """Returns the 3D objects in the file."""
     keys = set(types)
@@ -83,7 +98,11 @@ class STPFile:
 
     for obj in step.DesignCursor(self.stp_file):
       if step.type(obj) in keys and len(keys):
-        objects[step.type(obj)].append(self._convert(obj))
+        try:
+          objects[step.type(obj)].append(self._convert(obj))
+        except Exception as e:
+          STPFile.unreadable.append(obj)
+          STPFile.unreadable_types.add(step.type(obj.face_geometry))
     return objects
 
 
@@ -145,8 +164,8 @@ class PlaneCollection:
 # ------Execution below.------
 
 
-def main(precision, path, types):
-  """Executes the parallel-finding program."""
+def main(precision, path, types, out=True):
+  """Executes a parallel-finding program, as an example."""
   # Setting up.
   Config.DECIMALS = precision
   design = STPFile(path)
@@ -161,11 +180,16 @@ def main(precision, path, types):
   # NOTE: now here are three things we can do.
 
   # 1. Displays all objects.
-  display_all_objects(objects)
+  # display_all_objects(objects)
 
   # 2. Displays the planes.
-  planes.display_planes()
+  # planes.display_planes()
 
   # 3. Displays the pairwise distances.
-  planes.display_pairwise_distances()
+  # planes.display_pairwise_distances()
+
+  # 4. Displaying read results when requested.
+  if out:
+    STPFile.print_errors()
+    print(f"- Successfully read {len(objects['advanced_face'])} faces.")
 
