@@ -23,12 +23,12 @@ The program defines several custom classes for working with 3D geometry, includi
 - Ran 8 STP test files through the program. Read all planar surfaces, while printing faces of curved surfaces (I haven't figured out how to read a curved surface yet, might require some non-linear equations). **I consider it quite successful; the program can read planes from all STP files**. Printout is provided below (code block 1). Also wrote unit tests and conducted debugging.
 
 ### Short-Term Goals
-***Create a user manual for the developed program, add comments to each part for future maintenance and continuation of work.***
-***Compile the computable data, provide conceptual definitions. Here's what I can think of:***
-  1. Sorting planes along an axis.
-     - An "axis" is a line passing through the origin in 3D space. Given $n$ planes, let $P = \{p_1, p_2, ...\}$ such that $p_i$ represents the position of the $i$-th plane on this axis ($p_i \in \mathbb{R}$). Then:
-     - **We can calculate the minimum distance $\min|p_{i}-p_{i+1}| \text{, for all } p_i, p_{i+1} \in P$ to obtain the smallest separation between two parallel planes. This can also represent "thickness" of a slab.** Customizable level of approximation.
-  2. Displaying the outer "edges" of the planes. An "edge" is defined as $(v_i, v_j) \text{ where } v_i, v_j$ are two vertices (or vectors, identically represented). This program can verify and print the cycle of edges, i.e., output $\{(v_1, v_2), (v_2, v_3), ..., (v_n, v_1)\}$, **which forms the outer "edge"**.
+- ***Create a user manual for the developed program, add comments to each part for future maintenance and continuation of work.***
+- ***Compile the computable data, provide conceptual definitions. Here's what I can think of:***
+    1. Sorting planes along an axis.
+       - An "axis" is a line passing through the origin in 3D space. Given $n$ planes, let $P = \{p_1, p_2, ...\}$ such that $p_i$ represents the position of the $i$-th plane on this axis ($p_i \in \mathbb{R}$). Then:
+       - **We can calculate the minimum distance $\min|p_{i}-p_{i+1}| \text{, for all } p_i, p_{i+1} \in P$ to obtain the smallest separation between two parallel planes. This can also represent "thickness" of a slab.** Customizable level of approximation.
+    2. Displaying the outer "edges" of the planes. An "edge" is defined as $(v_i, v_j) \text{ where } v_i, v_j$ are two vertices (or vectors, identically represented). This program can verify and print the cycle of edges, i.e., output $\{(v_1, v_2), (v_2, v_3), ..., (v_n, v_1)\}$, **which forms the outer "edge"**.
 
 ### Future Code Maintenance
 1. **Thickness Calculation**: Instead of solely relying on distance between planes, "thickness" can be inferred by checking whether two parallel faces "cover" each other on the same axis. It's also possible to check for the existence of other parallel planes connected by edges between the two planes.
