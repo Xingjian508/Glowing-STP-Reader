@@ -4,7 +4,7 @@ import math
 class Config:
   """Stores necesssary configurations."""
   # NOTE! DECIMALS by default, unless changed.
-  DECIMALS = 3
+  DECIMALS = 0
 
 
 class Vector:
@@ -19,6 +19,8 @@ class Vector:
     """Initializes the x, y, z if c is valid."""
     if isinstance(c, tuple) and len(c) == 3:
       return tuple(n if not n==0 else 0 for n in c)
+    elif isinstance(c, Vector):
+      return tuple(n for n in c.coordinates)
     return None, None, None
 
   def __repr__(self):
@@ -170,8 +172,17 @@ class Bound:
   """Stores a collection of edges."""
   def __init__(self, edges=None):
     """Initializes a Bound object."""
-    self.edges = edges
-    self.vertices = self._connect(edges)
+    self.vert_graph: dict = self._connect_edge_graph(edges)
+    self.vertices: dict = self._make_vertex_loop(self.vert_graph)
+    self.edges: list = self.get_edge_loop()
+
+  def __repr__(self):
+    """Returns the string representation."""
+    output = 'Bound(\n'
+    for edge in self.edges:
+      output += '  ' + str(edge) + '\n'
+    output += ')'
+    return output
 
   def __iter__(self):
     """Iterator method for Bound object."""
@@ -179,32 +190,64 @@ class Bound:
       yield edge
 
   @staticmethod
-  def _connect(edges):
-    """Connects the edges."""
+  def _connect_edge_graph(edges):
+    """Connects the edges as a graph."""
     con = dict()
-    used = set()
     for edge in edges:
-      if edge.start not in con:
-        con[edge.start] = edge.end
-      else:
-        assert edge.end not in con
-        con[edge.end] = edge.start
+      con[edge.start] = []
+      con[edge.end] = []
+
+    for edge in edges:
+      con[edge.start].append(edge.end)
+      con[edge.end].append(edge.start)
     return con
 
-  def get_loop(self, start_pos=None):
-    """Returns a loop that describes the bound."""
+  @staticmethod
+  def _make_vertex_loop(vert_graph):
+    """Makes a dictionary of bound cycle."""
+    vertices = dict()
+    last_edge = None
+    curr_edge = next(iter(vert_graph))
+
+    for i in range(len(vert_graph)):
+      assert len(vert_graph[curr_edge]) == 2
+      # Upon checking A -> {B, C} and B -> {A, D} etc.
+      next_edge = vert_graph[curr_edge][0]
+      if last_edge is not None:
+        if next_edge == last_edge: # A -> B -> A situation.
+          next_edge = vert_graph[curr_edge][1]
+      vertices[curr_edge] = next_edge
+      last_edge = curr_edge
+      curr_edge = next_edge
+    return vertices
+
+  def get_vertex_loop(self, start_pos=None):
+    """Returns a vertex loop that describes the bound."""
     output = []
 
-    key = next(iter(self.vertices))
+    if start_pos is None:
+      key = next(iter(self.vertices))
+    else:
+      assert start_pos in self.vertices.keys()
+      key = start_pos
     while len(output) < len(self.vertices):
       output.append(self.vertices[key])
       key = self.vertices[key]
     return output
 
+  def get_edge_loop(self, start_pos=None):
+    """Returns an edge loop that describes the bound."""
+    output = []
+    vl = self.get_vertex_loop(start_pos)
+    for i in range(len(vl)-1):
+      output.append(Edge(vl[i], vl[i+1]))
+    output.append(Edge(vl[-1], vl[0]))
+    return output
+
   def print_loop(self, start_pos=None):
     """Prints out the loop in node format."""
     output = ""
-    vert_list = self.get_loop(start_pos)
+    vert_list = self.get_vertex_loop(start_pos)
     for vert in vert_list:
       output += str(vert) + ' <-> '
     output += 'origin'
@@ -243,7 +286,7 @@ class Face:
 
   def area(self):
     """Returns the total area of the Face object."""
-    verts = self.bound.get_loop()
+    verts = self.bound.get_vertex_loop()
     total_area = 0
     for i in range(1, len(verts)-1):
       total_area += self._tri_area(verts[0], verts[i], verts[i+1])
@@ -252,7 +295,7 @@ class Face:
   def contains(self, v):
     """Determines if v rests on the Face object."""
     if self.plane.contains(v):
-      verts = self.bound.get_loop()
+      verts = self.bound.get_vertex_loop()
       pivot = verts[0]
       for i in range(1, len(verts)-1):
         if self._tri_contains(v, pivot, verts[i], verts[i+1]):
