@@ -20,7 +20,8 @@ HI EVERYONE! I wrote this program that allows us to analyze and explore objects 
 The program defines several custom classes for working with 3D geometry, including `Vector`, `Edge`, `Bound`, and more. These classes provide fundamental operations for vectors, edges, surfaces, and geometric transformations.
 
 ### Progress (As of August 30th)
-- Ran 8 STP test files through the program. I did not upload them as the STP designs are not owned by me. However, the code had read all planar surfaces, while printing faces of curved surfaces (I haven't figured out how to read a curved surface yet, might require some non-linear equations). **I consider it quite successful; the program can read planes from all STP files**. Printout is provided below (code block 1). Also wrote unit tests and did debugging.
+- Ran 8 STP test files through the program. I did not upload them as the STP designs are not owned by me. However, the code had read all planar surfaces, while printing faces of curved surfaces (I haven't figured out how to read a curved surface yet, might require some non-linear equations).
+- **I consider it quite successful; the program can read planes from all STP files**. Printout is provided below (code block 1). Also wrote unit tests and did debugging.
 
 ### Short-Term Goals
 - ***Create a user manual for the developed program, add comments to each part for future maintenance and continuation of work.***
