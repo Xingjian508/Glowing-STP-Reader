@@ -31,7 +31,6 @@ The program defines several custom classes for working with 3D geometry, includi
   2. Displaying the outer "edges" of the planes. An "edge" is defined as $(v_i, v_j) \text{ where } v_i, v_j$ are two vertices (or vectors, identically represented). This program can verify and print the cycle of edges, i.e., output $\{(v_1, v_2), (v_2, v_3), ..., (v_n, v_1)\}$, **which forms the outer "edge"**.
 
 ### Future Code Maintenance
-- Suggestions for improving this program:
  1. **Thickness Calculation**: Instead of solely relying on distance between planes, "thickness" can be inferred by checking whether two parallel faces "cover" each other on the same axis. It's also possible to check for the existence of other parallel planes connected by edges between the two planes.
      	- Consider a can. The top and bottom of the can are two parallel planes, and there are also side surfaces connecting the outer "edge" of the top and bottom. In this scenario, it's considered to have "thickness".
      	- **Building upon the existing program, this isn't overly complex**. If successful hashing is available, it would take $\mathbf{O}(n)$ time.
