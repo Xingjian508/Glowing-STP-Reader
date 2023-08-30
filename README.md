@@ -32,8 +32,8 @@ The program defines several custom classes for working with 3D geometry, includi
 
 ### Future Code Maintenance
 1. **Thickness Calculation**: Instead of solely relying on distance between planes, "thickness" can be inferred by checking whether two parallel faces "cover" each other on the same axis. It's also possible to check for the existence of other parallel planes connected by edges between the two planes.
-     	- Consider a can. The top and bottom of the can are two parallel planes, and there are also side surfaces connecting the outer "edge" of the top and bottom. In this scenario, it's considered to have "thickness".
-     	- **Building upon the existing program, this isn't overly complex**. If successful hashing is available, it would take $\mathbf{O}(n)$ time.
+   - Consider a can. The top and bottom of the can are two parallel planes, and there are also side surfaces connecting the outer "edge" of the top and bottom. In this scenario, it's considered to have "thickness".
+   - **Building upon the existing program, this isn't overly complex**. If successful hashing is available, it would take $\mathbf{O}(n)$ time.
 2. **Calculating Rib Height, Width, Draft Angle**: My conclusion regarding this matter is that while using AI could be attempted, a well-defined convention (when does an object have "height, width, draft angle") would be more straightforward. For example, for objects with certain attributes, a correct calculation can be achieved. Some flexibility can be allowed, but with precise definitions (height being the tallest "rod," a "rod" being approximately four-sided with an aspect ratio greater than n units...), it might work better.
 
 ## Contributing
