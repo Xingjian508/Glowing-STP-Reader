@@ -8,19 +8,12 @@ HI EVERYONE! I wrote this program that allows us to analyze and explore objects 
 - Processes and converts STEP objects into user-defined classes for enhanced functionality.
 - Constructs planes and categorizes them based on parallel directions.
 - Provides tools to display plane information, including positions, directions, and distances.
-- Demonstrates how to use self-defined classes for 3D geometry operations.
+- Has self-defined classes for 3D geometry operations.
 
 ## Requirements
 
 - Python 3
 - `steptools` library (for working with STEP files)
-
-## Usage
-
-1. Clone the repository and navigate to the project directory.
-2. Modify the `main` function in the provided code to specify your desired precision, path to the STEP file, and object types you want to analyze.
-3. Run the program using `python3 main.py` in the terminal.
-4. Observe the output, which displays information about extracted objects, categorized planes, and pairwise distances.
 
 ## Custom Classes
 
@@ -39,10 +32,10 @@ The program defines several custom classes for working with 3D geometry, includi
 
 ### Future Code Maintenance
 - Suggestions for improving this program:
-  > 1. **Thickness Calculation**: Instead of solely relying on distance between planes, "thickness" can be inferred by checking whether two parallel faces "cover" each other on the same axis. It's also possible to check for the existence of other parallel planes connected by edges between the two planes.
-     > 	- Consider a can. The top and bottom of the can are two parallel planes, and there are also side surfaces connecting the outer "edge" of the top and bottom. In this scenario, it's considered to have "thickness".
-     > 	- **Building upon the existing program, this isn't overly complex**. If successful hashing is available, it would take $\mathbf{O}(n)$ time.
-  > 1. **Calculating Rib Height, Width, Draft Angle**: My conclusion regarding this matter is that while using AI could be attempted, a well-defined convention (when does an object have "height, width, draft angle") would be more straightforward. For example, for objects with certain attributes, a correct calculation can be achieved. Some flexibility can be allowed, but with precise definitions (height being the tallest "rod," a "rod" being approximately four-sided with an aspect ratio greater than n units...), it might work better.
+ 1. **Thickness Calculation**: Instead of solely relying on distance between planes, "thickness" can be inferred by checking whether two parallel faces "cover" each other on the same axis. It's also possible to check for the existence of other parallel planes connected by edges between the two planes.
+     	- Consider a can. The top and bottom of the can are two parallel planes, and there are also side surfaces connecting the outer "edge" of the top and bottom. In this scenario, it's considered to have "thickness".
+     	- **Building upon the existing program, this isn't overly complex**. If successful hashing is available, it would take $\mathbf{O}(n)$ time.
+ 2. **Calculating Rib Height, Width, Draft Angle**: My conclusion regarding this matter is that while using AI could be attempted, a well-defined convention (when does an object have "height, width, draft angle") would be more straightforward. For example, for objects with certain attributes, a correct calculation can be achieved. Some flexibility can be allowed, but with precise definitions (height being the tallest "rod," a "rod" being approximately four-sided with an aspect ratio greater than n units...), it might work better.
 
 ## Contributing
 
