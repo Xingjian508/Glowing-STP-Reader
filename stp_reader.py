@@ -7,6 +7,9 @@
 # 6. Use 2 spaces for a tab, 2 lines for level 1, and 1 line for level 2.
 
 
+# TODO: finish up the utilization of "shadow", according to program features in the user manual.
+
+
 from steptools import step
 from regular_obj import Config, Face, Bound, Plane, Edge, Vector
 
@@ -169,6 +172,48 @@ class PlaneCollection:
       print(f'Plane 0 and Plane {total} distance:', \
             f'{col[0].distance_to_plane(col[total])}')
       print('------')
+
+
+class FaceCollection:
+  """Stores faces."""
+  def __init__(self, faces=None):
+    """Initializes a PlaneCollection object."""
+    self.faces = faces
+    self.parallel = self._make_parallel(faces)
+    self._sort_by_axis_pos(self.parallel)
+
+  def __repr__(self):
+    """Returns the string representation."""
+    return f'FaceCollection({str(self.faces)})'
+
+  @staticmethod
+  def _make_parallel(faces: list):
+    """Returns a dictionary of faces sorted by axis."""
+    parallel = dict()
+    for face in faces:
+      abs_unit_ax = approx_vec(face.plane.abs_unit_dir())
+      if abs_unit_ax in parallel:
+        parallel[abs_unit_ax].append(face)
+      else:
+        parallel[abs_unit_ax] = [face]
+    return parallel
+
+  @staticmethod
+  def _sort_by_axis_pos(faces_by_dir: dict):
+    """Sorts values (in face lists) by axis positions."""
+    for key in faces_by_dir:
+      faces = faces_by_dir[key]
+      faces_by_dir[key] = sorted(faces, key=lambda f:\
+                                  f.plane.pos_from_origin())
+
+  @withdividers
+  def display_faces(self):
+    """Prints out each direction and its planes."""
+    for direction in self.parallel:
+      print(f'Direction: {direction.coordinates}')
+      for face in self.parallel[direction]:
+        print(f'Position {face.plane.pos_from_origin()}, {face}')
+      print('------')
   
 
 # ------Execution below.------
@@ -184,19 +229,19 @@ def main(precision, path, types, out=True):
   objects = design.get_3D_objects(types)
 
   # Gets the planes and categorize by parallel.
-  plane_list = objects['advanced_face']
-  planes = PlaneCollection([f.plane for f in plane_list])
+  face_list = objects['advanced_face']
+  faces = FaceCollection([f for f in face_list])
   
   # # NOTE: now here are three things we can do.
 
   # 1. Displays all objects.
-  display_all_objects(objects)
+  # display_all_objects(objects)
 
-  # # 2. Displays the planes.
-  planes.display_planes()
+  # 2. Displays the planes.
+  faces.display_faces()
 
-  # # 3. Displays the pairwise distances.
-  planes.display_pairwise_distances()
+  # 3. Displays the pairwise distances.
+  # planes.display_pairwise_distances()
 
   # Displaying read results when requested.
   if out:

@@ -267,6 +267,38 @@ class Bound:
     output += 'origin'
     print(output)
 
+  @staticmethod
+  def _tri_area(v1, v2, v3):
+    """Returns the triangular area inscribed in three Vector objects."""
+    v, u = v2-v1, v3-v1
+    return v.cross_product(u).norm()/2.0
+
+  @staticmethod
+  def _tri_contains(p, v1, v2, v3):
+    """Determines whether the point lies in the triangle inscribed."""
+    total_area = Bound._tri_area(v1, v2, v3)
+    t_sum = Bound._tri_area(p, v1, v2) + \
+            Bound._tri_area(p, v2, v3) + \
+            Bound._tri_area(p, v3, v1)
+    return abs(total_area-t_sum) < (1/math.pow(10, Config.DECIMALS))
+
+  def area(self):
+    """Returns the total area of the Bound object."""
+    verts = self.get_vertex_loop()
+    total_area = 0
+    for i in range(1, len(verts)-1):
+      total_area += self._tri_area(verts[0], verts[i], verts[i+1])
+    return total_area
+
+  def contains(self, v):
+    """Determines if v rests on the Bound object."""
+    verts = self.get_vertex_loop()
+    pivot = verts[0]
+    for i in range(1, len(verts)-1):
+      if self._tri_contains(v, pivot, verts[i], verts[i+1]):
+        return True
+    return False
+
 
 class Face:
   """Stores a Plane and Bound object."""
@@ -283,35 +315,31 @@ class Face:
     output += ')'
     return output
 
-  @staticmethod
-  def _tri_area(v1, v2, v3):
-    """Returns the triangular area inscribed in three Vector objects."""
-    v, u = v2-v1, v3-v1
-    return v.cross_product(u).norm()/2.0
-
-  @staticmethod
-  def _tri_contains(p, v1, v2, v3):
-    """Determines whether the point lies in the triangle inscribed."""
-    total_area = Face._tri_area(v1, v2, v3)
-    t_sum = Face._tri_area(p, v1, v2) + \
-            Face._tri_area(p, v2, v3) + \
-            Face._tri_area(p, v3, v1)
-    return abs(total_area-t_sum) < (1/math.pow(10, Config.DECIMALS))
-
   def area(self):
     """Returns the total area of the Face object."""
-    verts = self.bound.get_vertex_loop()
-    total_area = 0
-    for i in range(1, len(verts)-1):
-      total_area += self._tri_area(verts[0], verts[i], verts[i+1])
-    return total_area
+    return self.bound.area()
 
   def contains(self, v):
     """Determines if v rests on the Face object."""
-    if self.plane.contains(v):
-      verts = self.bound.get_vertex_loop()
-      pivot = verts[0]
-      for i in range(1, len(verts)-1):
-        if self._tri_contains(v, pivot, verts[i], verts[i+1]):
-          return True
+    return self.plane.contains(v) and self.bound.contains(v)
+
+
+  def shadow(self, other):
+    """Determines if shadow overlaps occur."""
+    self_verts = self.bound.get_vertex_loop()
+    other_verts = other.bound.get_vertex_loop()
+    normal_vec = self.plane.abs_unit_dir()
+    dist = self.plane.distance_to_plane(other.plane)
+  
+    assert self.plane.is_parallel_to(other.plane)
+    assert normal_vec == other.plane.abs_unit_dir()
+
+    for vert in self_verts + other_verts:
+      projections = [vert+(normal_vec*dist), vert-(normal_vec*dist)]
+      if any(other.contains(proj) for proj in projections):
+        return True
+      if any(self.contains(proj) for proj in projections):
+        return True
+  
     return False
+

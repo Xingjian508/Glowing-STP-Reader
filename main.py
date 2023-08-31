@@ -7,27 +7,40 @@
 # 6. Use 2 spaces for a tab, 2 lines for level 1, and 1 line for level 2.
 
 
+import io
 from stp_reader import main
+from contextlib import redirect_stdout
 
 
-if __name__ == '__main__':
-  # Setting up.
-  PRECISION = 3
-  PATHS = ['sample_surface.stp', 'hard.stp', 'hud_shell.stp', 'surface.stp']
-  TYPES = 'advanced_face', 'vertex_point'
+with io.StringIO() as buf, redirect_stdout(buf):
+  if __name__ == '__main__':
+    # Setting up.
+    PRECISION = 3
+    PATHS = ['sample_surface.stp', 'hard.stp', 'hud_shell.stp', 'surface.stp']
+    TYPES = 'advanced_face', 'vertex_point'
+    
+    # Executes the program.
+    main(PRECISION, f'stp_files/sample_surface.stp', TYPES, out=False)
+    print('Start of Test')
   
-  # Executes the program.
-  main(PRECISION, f'stp_files/sample_surface.stp', TYPES, out=False)
-  print('Start of Test')
+    # # NOTE: TEST with test bundle.
+    # for i in range(1, 5):
+    #   print(f'Test: test{i}.stp')
+    #   main(PRECISION, f'stp_files/test{i}.stp', TYPES)
+    #   print()
+  
+    # # NOTE: TEST with real life projects.
+    # for PATH in PATHS:
+    #   print(f'Test: {PATH}')
+    #   main(PRECISION, f'stp_files/{PATH}', TYPES)
+    #   print()
+  
+    print('End of Test')
 
-  # NOTE: TEST with test bundle.
-  for i in range(1, 5):
-    print(f'Test: test{i}.stp')
-    main(PRECISION, f'stp_files/test{i}.stp', TYPES)
-    print()
-
-  # NOTE: TEST with real life projects.
-  for PATH in PATHS:
-    print(f'Test: {PATH}')
-    main(PRECISION, f'stp_files/{PATH}', TYPES)
-    print()
+    
+    # Now get value and print to file.
+    program_output = buf.getvalue()
+    with open('output.txt', 'w') as out:
+      out.write(program_output)
+  
+print(program_output)
