@@ -121,7 +121,7 @@ class PlaneCollection:
     """Initializes a PlaneCollection object."""
     self.planes = planes
     self.parallel = self._make_parallel(planes)
-    self._sort_by_axis_pos(parallel)
+    self._sort_by_axis_pos(self.parallel)
 
   def __repr__(self):
     """Returns the string representation."""
