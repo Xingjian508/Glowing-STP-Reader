@@ -2,54 +2,70 @@
 
 HI EVERYONE! I wrote this program that allows us to analyze and explore objects within STEP files. It uses the `steptools` library for working with STEP files, while enabling us to extract, categorize, and do numerical operations with 3D objects taken from the file.
 
-## Features
+### Definitions
+> The program is object oriented; it mimics the idea of these 3D objects in reality. Here are definitions for each and their design decisions.
+- **Vector/Vertex**: a vector $v$ is a collection of $(x, y, z)$ points in the $\mathbb{R}^3$ space.
+	- It could be interpreted as an "arrow with direction and magnitude", or a "point" in a 3D space (which means vertex).
+- **Edge**: an edge $e$ is a tuple of $2$ vectors $(v_{\text{start}}, v_{\text{end}})$ representing an edge segment.
+- **Graph**: a graph $G$ contains $V$ and $E$.
+	- $V$ is the collection of vertices $\{v_1, v_2, ..., v_n\}$.
+	- $E$ is the collection of edges. $E \subset V \times V$, with $v_i \neq v_j$ for any $(v_i, v_j) \in E$.
+- **Bound**: a bound $B$ is a circular graph with $n$ vertices and $n$ edges.
+	- Its edges $E$ is strictly a cycle, with $E = \{(v_1, v_2), (v_2, v_3), ..., (v_n, v_1)\}$.
+- **Plane**: a plane $P$ is represented by two vectors $v_{\text{anchor}}$ and $v_{\text{normal}}$.
+	 - Interpretation: the plane "starts" at $v_{\text{anchor}}$, and faces the $v_{\text{normal}}$ direction.
+	 - Formally, we can define $P = \{\alpha v_p + v_{\text{anchor}} : \forall \alpha \in \mathbb{R}, \forall v_p \cdot v_{\text{normal}} = 0\}$.
+- **Face**: a face $F$ contains a bound $B$ and a plane $P$.
 
-- Extracts 3D objects from STEP files and categorizes them by type.
-- Processes and converts STEP objects into user-defined classes for enhanced functionality.
-- Constructs planes and categorizes them based on parallel directions.
-- Provides tools to display plane information, including positions, directions, and distances.
-- Has self-defined classes for 3D geometry operations.
+### Program Features
+1. Reading all STP `advanced_faces` and converting them to `Face` objects.
+	- Encapsulates the `Plane` they are on, and the `Bound` they reside in.
+	- Requires these faces to be planar, not curved.
+2. Grouping the parallel `Face` together.
+	- Creates, for each $v_{\text{normal}}$, an array of faces with the same normal vector.
+	- Constructs mapping between $v \rightarrow \text{array} \langle F \rangle$.
+3. Sorting `Plane` by their position on the same axis.
+	- Any axis in the 3D plane works, representing the planes' normal vectors.
+	- Find the axis-position of plane $P_i$ denoted as $p_i \in \mathbb{R}$. Sort planes by $p_i$.
+4. Displaying pairwise `Plane` distances.
+	- For sorted $\text{array}\langle P \rangle$ of length $n$ described above, the distance between consecutive $P_i$ and $P_{i+1}$ can be calculated.
+	- Moreover, $\min|p_{i}-p_{i+1}| \text{ for all } i < n$ yields a lower bound for the thickness of any "slab".
+1. Calculating the area of each `Face`.
+	- Any number of edges is fine — the classic polygon area problem.
+2. Detecting if `Face` overlap with each other.
+	- For two faces $F_1, F_2$, they overlap each other when, on the same axis, one can "project a shadow" onto the other.
+	- A formal definition would be that there exists points $p_1 \in F_1, p_2 \in F_2$ such that the edge $(p_1, p_2)$ is perpendicular to both $F_1$ and $F_2$.
 
-## Requirements
+### Program Structure
+- `main.py` runs the program. Three configurations are needed.
+	- `PRECISION: int` (the number of decimals desired).
+	- `PATH: str` (the path of the STP file).
+	- `TYPES: tuple` (the types of objects we wish to extract).
+- `stp_reader.py` stores the functions necessary to interpret STP files and initialize our custom 3D objects.
+	- The `main` function has detailed instructions on usable commands.
+	- The `STPFile` object stores an STP file, and returns a list of custom defined 3D objects. `PlaneCollection` processes them (e.g. `make_parallel`).
+	- At the end, unreadable faces (curved surfaces) are printed.
+- `regular_obj.py` stores all the aforementioned 3D objects.
+	- `Vector` can add, subtract, scalar multiplication, calculate norm, unit vector, and dot & cross products. It can also be iterated and hashed.
+	- `Edge` is just two `Vector` objects.
+	- `Plane` can check if it contains a `Vector`, return its unit normal vector, check if it is parallel with another plane (and if so, calculate the distance in between), calculate if it contains a point, calculate the distance to a point, calculate its position from origin.
+	- `Bound` checks if the inputted edges form a strict loop, and connects the loop using a dictionary, storing a sorted edge list.
+	- `Face` can calculate its area, and whether it contains a point.
+- `program_tests.py` provides unit testing for the `regular_obj.py` file.
 
-- Python 3
-- `steptools` library (for working with STEP files)
+### Usage & Prerequisites
+The usage of the program is labeled in the code, in detail. The prerequisites needed include Python3, and `steptools`.
 
-## Custom Classes
-
-The program defines several custom classes for working with 3D geometry, including `Vector`, `Edge`, `Bound`, and more. These classes provide fundamental operations for vectors, edges, surfaces, and geometric transformations.
-
-### Progress (As of August 30th)
-- Ran 8 STP test files through the program. I did not upload them as the STP designs are not owned by me. However, the code had read all planar surfaces, while printing faces of curved surfaces (I haven't figured out how to read a curved surface yet, might require some non-linear equations).
-- **I consider it quite successful; the program can read planes from all STP files**. Printout is provided below (code block 1). Also wrote unit tests and did debugging.
-
-### Short-Term Goals
-- ***Create a user manual for the developed program, add comments to each part for future maintenance and continuation of work.***
-- ***Compile the computable data, provide conceptual definitions. Here are features already accomplished:***
-    1. Sorting planes along an axis.
-       - An "axis" is a line passing through the origin in 3D space. Given $n$ planes, let $P = \{p_1, p_2, ...\}$ such that $p_i$ represents the position of the $i$-th plane on this axis ($p_i \in \mathbb{R}$). Then:
-       - **We can calculate the minimum distance $\min|p_{i}-p_{i+1}| \text{, for all } p_i, p_{i+1} \in P$ to obtain the smallest separation between two parallel planes. This can also represent "thickness" of a slab.** Customizable level of approximation.
-    2. Displaying the outer "edges" of the planes. An "edge" is defined as $(v_i, v_j) \text{ where } v_i, v_j$ are two vertices (or vectors, identically represented). This program can verify and print the cycle of edges, i.e., output $\{(v_1, v_2), (v_2, v_3), ..., (v_n, v_1)\}$, **which forms the outer "edge"**.
-
-### Future Code Maintenance
-1. **Thickness Calculation**: Instead of solely relying on distance between planes, "thickness" can be inferred by checking whether two parallel faces "cover" each other on the same axis. It's also possible to check for the existence of other parallel planes connected by edges between the two planes.
-    - Consider a can. The top and bottom of the can are two parallel planes, and there are also side surfaces connecting the outer "edge" of the top and bottom. In this scenario, it's considered to have "thickness".
-    - **Building upon the existing program, this isn't overly complex**. If successful hashing is available, it would take $\mathbf{O}(n)$ time.
-2. **Calculating Rib Height, Width, Draft Angle**: My conclusion regarding this matter is that while using AI could be attempted, a well-defined convention (when does an object have "height, width, draft angle") would be more straightforward. For example, for objects with certain attributes, a correct calculation can be achieved. Some flexibility can be allowed, but with precise definitions (height being the tallest "rod," a "rod" being approximately four-sided with an aspect ratio greater than n units...), it might work better.
-
-## Contributing
-
-Contributions, suggestions, and improvements are welcome! Feel free to open issues or submit pull requests.
-
-## License
-
-Just me lol.
-
+### Code Maintenance and Improvement Ideas
+1. **Enhance Thickness Calculation Method**: Instead of relying solely on distance, consider whether two parallel planes overlap each other on the same axis to determine their thickness (mentioned in "Program Features"). One can also examine the existence of other parallel planes and connect their "edges".
+	- For example, think of a can: the top and bottom are two parallel planes, and there's a side connecting the outer "edges" of both the top and bottom. In this scenario, we say there's "thickness".
+	- **This isn't difficult to implement on top of the existing program**. With a successful hash, it would only require $\text{O}(n)$ time complexity.
+2. **Calculate "Rib" Height, Width, and Draft Angle**: Having a well-defined convention (defining when an object has "height, width, draft angle") would be more straightforward. For instance, in the attached image below, precise definition (where height is the highest point of a "rib," a "rib" is approximately four-sided with an aspect ratio exceeding n units) could be more beneficial.
 ---
 
 Created by Xingjian Wang, August 2023
 
-**Code Block 1**
+**Code Block 1 - Testing Results**
 ``` python
 Start of Test
 
