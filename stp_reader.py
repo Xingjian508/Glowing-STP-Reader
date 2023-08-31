@@ -1,3 +1,12 @@
+# Code Style:
+# 1. All object attributes are shown in the __init__ methods.
+# 2. All helper methods "_func()" are front-underscored and are static methods.
+# 3. All dunder "__func__()" are defined first, then the helpers, then the rest.
+# 4. All classes and methods, including dunders and helpers, have docstrings.
+# 5. All objects can be created without default parameters.
+# 6. Use 2 spaces for a tab, 2 lines for level 1, and 1 line for level 2.
+
+
 from steptools import step
 from regular_obj import Config, Face, Bound, Plane, Edge, Vector
 
@@ -111,17 +120,18 @@ class PlaneCollection:
   def __init__(self, planes=None):
     """Initializes a PlaneCollection object."""
     self.planes = planes
-    self.parallel = self.make_parallel()
-    self.sort_by_axis_pos(self.parallel)
+    self.parallel = self._make_parallel(planes)
+    self._sort_by_axis_pos(parallel)
 
   def __repr__(self):
     """Returns the string representation."""
     return f'PlaneCollection({str(self.planes)})'
 
-  def make_parallel(self):
+  @staticmethod
+  def _make_parallel(planes: list):
     """Returns a dictionary of planes sorted by axis."""
     parallel = dict()
-    for plane in self.planes:
+    for plane in planes:
       abs_unit_ax = approx_vec(plane.abs_unit_dir())
       if abs_unit_ax in parallel:
         parallel[abs_unit_ax].append(plane)
@@ -130,7 +140,7 @@ class PlaneCollection:
     return parallel
 
   @staticmethod
-  def sort_by_axis_pos(planes_by_dir: dict):
+  def _sort_by_axis_pos(planes_by_dir: dict):
     """Sorts values (in plane lists) by axis positions."""
     for key in planes_by_dir:
       planes = planes_by_dir[key]
@@ -165,7 +175,7 @@ class PlaneCollection:
 
 
 def main(precision, path, types, out=True):
-  """Executes a parallel-finding program, as an example."""
+  """Executes the parallel-finding program."""
   # Setting up.
   Config.DECIMALS = precision
   design = STPFile(path)
@@ -177,18 +187,18 @@ def main(precision, path, types, out=True):
   plane_list = objects['advanced_face']
   planes = PlaneCollection([f.plane for f in plane_list])
   
-  # NOTE: now here are three things we can do.
+  # # NOTE: now here are three things we can do.
 
   # 1. Displays all objects.
-  # display_all_objects(objects)
+  display_all_objects(objects)
 
-  # 2. Displays the planes.
-  # planes.display_planes()
+  # # 2. Displays the planes.
+  planes.display_planes()
 
-  # 3. Displays the pairwise distances.
-  # planes.display_pairwise_distances()
+  # # 3. Displays the pairwise distances.
+  planes.display_pairwise_distances()
 
-  # 4. Displaying read results when requested.
+  # Displaying read results when requested.
   if out:
     STPFile.print_errors()
     print(f"- Successfully read {len(objects['advanced_face'])} faces.")
