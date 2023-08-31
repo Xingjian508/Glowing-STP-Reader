@@ -8,13 +8,13 @@ HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objec
 	- It could be interpreted as an "arrow with direction and magnitude", or a "point" in a 3D space (which means vertex).
 - **Edge**: an edge $e$ is a tuple of $2$ vectors $(v_{\text{start}}, v_{\text{end}})$ representing an edge segment.
 - **Graph**: a graph $G$ contains $V$ and $E$.
-	- $V$ is the collection of vertices $\{v_1, v_2, ..., v_n\}$.
+	- $V$ is the collection of vertices $\\{v_1, v_2, ..., v_n\\}$.
 	- $E$ is the collection of edges. $E \subset V \times V$, with $v_i \neq v_j$ for any $(v_i, v_j) \in E$.
 - **Bound**: a bound $B$ is a circular graph with $n$ vertices and $n$ edges.
-	- Its edges $E$ is strictly a cycle, with $E = \{(v_1, v_2), (v_2, v_3), ..., (v_n, v_1)\}$.
+	- Its edges $E$ is strictly a cycle, with $E = \\{(v_1, v_2), (v_2, v_3), ..., (v_n, v_1)\\}$.
 - **Plane**: a plane $P$ is represented by two vectors $v_{\text{anchor}}$ and $v_{\text{normal}}$.
 	 - Interpretation: the plane "starts" at $v_{\text{anchor}}$, and faces the $v_{\text{normal}}$ direction.
-	 - Formally, we can define $P = \{\alpha v_p + v_{\text{anchor}} : \forall \alpha \in \mathbb{R}, \forall v_p \cdot v_{\text{normal}} = 0\}$.
+	 - Formally, we can define $P = \\{\alpha v_p + v_{\text{anchor}} : \forall \alpha \in \mathbb{R}, \forall v_p \cdot v_{\text{normal}} = 0\\}$.
 - **Face**: a face $F$ contains a bound $B$ and a plane $P$.
 
 ### Program Features
