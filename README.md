@@ -1,6 +1,6 @@
-# Parallel Plane Analyzer for STEP Files
+# Surface Analyzer for STP Files
 
-HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objects within STEP files. It uses the `steptools` library for working with STEP files, while enabling us to extract, categorize, and do numerical operations with 3D objects taken from the file.
+HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objects within STP files. It uses the `steptools` library for working with STP files, while enabling us to extract, categorize, and do numerical operations with 3D objects taken from the file.
 
 ### Definitions
 > The program is object oriented; it mimics the idea of these 3D objects in reality. Here are definitions for each and their design decisions.
