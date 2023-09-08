@@ -7,11 +7,12 @@
 # 6. Use 2 spaces for a tab, 2 lines for level 1, and 1 line for level 2.
 
 
-# TODO: finish up the utilization of "shadow", according to program features in the user manual.
-
+# TODO: Finish up the utilization of "shadow", according to program features in the user manual.
+# TODO: Examine why this simple counter thing has a problem.
 
 from steptools import step
 from regular_obj import Config, Face, Bound, Plane, Edge, Vector
+from nonregular_obj import ToroidalFace
 
 
 def approx(tup) -> tuple:
@@ -27,6 +28,8 @@ def approx_vec(vec) -> tuple:
 def withdividers(func):
   """Decorator to help print dividers."""
   def new_line_added_func(*args):
+    print()
+    print('******')
     func(*args)
     print('******')
     print()
@@ -45,20 +48,28 @@ def display_all_objects(objects):
 
 class STPFile:
   """Stores an STP file."""
-  unreadable = []
-  unreadable_types = set()
-
   def __init__(self, file_path=None):
     """Initializes an STPFile object."""
     if file_path is not None:
       self.stp_file = step.open_project(file_path)
+    self.unreadable = []
+    self.unreadable_types = set()
+    self.face_types = dict()
 
   def __repr__(self):
     """Returns the string representation."""
     return f'STPFile({file_path})'
 
-  @staticmethod
-  def _convert(obj):
+  def _count_face_type(self, face_obj):
+    """Counts the face type."""
+    if step.type(face_obj) == 'advanced_face':
+      k = step.type(face_obj.face_geometry)
+      if k in self.face_types:
+        self.face_types[k] += 1
+      else:
+        self.face_types[k] = 1
+
+  def _convert(self, obj):
     """Converts an stp object to a self defined one."""
     def pt_tup(cartesian_point_obj) -> tuple:
       return approx(tuple(cartesian_point_obj.coordinates))
@@ -66,12 +77,15 @@ class STPFile:
     def vec_tup(direction_obj) -> tuple:
       return approx(tuple(direction_obj.direction_ratios))
   
-    def get_plane_attr(face_obj) -> tuple:
-      pos = face_obj.face_geometry.position
+    def get_pos_attr(pos) -> tuple:
       loc, ax, ref_d = pos.location, pos.axis, pos.ref_direction
       return (pt_tup(loc), vec_tup(ax), vec_tup(ref_d))
 
-    def get_edges(face_obj) -> list:
+    def get_plane_attr(face_obj) -> tuple:
+      pos = face_obj.face_geometry.position
+      return get_pos_attr(pos)
+
+    def get_face_edges(face_obj) -> list:
       e_list = face_obj.bounds[0].bound.edge_list
       edges = []
       for edge in e_list:
@@ -79,14 +93,33 @@ class STPFile:
         v_e = edge.edge_element.edge_end.vertex_geometry
         edges.append(Edge(pt_tup(v_s), pt_tup(v_e)))
       return edges
+
+    def get_tor_edges(face_obj):
+      e = face_obj.bounds[0].bound.edge_list[0].edge_element
+
+      v_s = e.edge_start.vertex_geometry
+      v_e = e.edge_end.vertex_geometry
+      eg = e.edge_geometry
+
+      plane = Plane(*get_pos_attr(eg.position))
+      edge = Edge(pt_tup(v_s), pt_tup(v_e))
+      return edge, plane
+      
+    def create_face(obj):
+      fg = step.type(obj.face_geometry)
+      if fg == 'plane':
+        bound = Bound(get_face_edges(obj))
+        plane = Plane(*get_plane_attr(obj))
+        return Face(plane, bound)
+      elif fg == 'toroidal_surface':
+        edge, plane = get_tor_edges(obj)
+        maj_r, min_r = fg.major_radius, fg.minor_radius
+        return ToroidalFace(plane, edge, maj_r, min_r)
+      else:
+        raise Exception('Cannot be created.')
     
     if step.type(obj) == 'advanced_face':
-      try:
-        bound = Bound(get_edges(obj))
-      except Exception as e:
-        print('BOUND ERROR!!!')
-      plane = Plane(*get_plane_attr(obj))
-      return Face(plane, bound)
+      return create_face(obj)
 
     if step.type(obj) == 'vertex_point':
       pt_geometry = obj.vertex_geometry
@@ -94,12 +127,17 @@ class STPFile:
   
     return None
 
-  @staticmethod
-  def print_errors():
+  @withdividers
+  def print_face_stats(self):
+    """Prints how many faces are of each type."""
+    for key in self.face_types:
+      print(f'{key}: {self.face_types[key]}')
+
+  def print_errors(self):
     """Prints all objects that had error being read."""
-    if len(STPFile.unreadable):
-      print(f'- Out of all faces, {len(STPFile.unreadable)} are '+
-          f'unreadable, with formats {STPFile.unreadable_types}.') 
+    if len(self.unreadable):
+      print(f'- Out of all faces, {len(self.unreadable)} are '+
+          f'unreadable, with formats {self.unreadable_types}.') 
     else:
       print('All faces are readable.')
 
@@ -110,11 +148,13 @@ class STPFile:
 
     for obj in step.DesignCursor(self.stp_file):
       if step.type(obj) in keys and len(keys):
+        self._count_face_type(obj)
         try:
           objects[step.type(obj)].append(self._convert(obj))
         except Exception as e:
-          STPFile.unreadable.append(obj)
-          STPFile.unreadable_types.add(step.type(obj.face_geometry))
+          self.unreadable.append(obj)
+          self.unreadable_types.add(step.type(obj.face_geometry))
+
     return objects
 
 
@@ -177,7 +217,7 @@ class PlaneCollection:
 class FaceCollection:
   """Stores faces."""
   def __init__(self, faces=None):
-    """Initializes a PlaneCollection object."""
+    """Initializes a FaceCollection object."""
     self.faces = faces
     self.parallel = self._make_parallel(faces)
     self._sort_by_axis_pos(self.parallel)
@@ -185,6 +225,10 @@ class FaceCollection:
   def __repr__(self):
     """Returns the string representation."""
     return f'FaceCollection({str(self.faces)})'
+
+  def __len__(self):
+    """Returns the length of faces."""
+    return len(self.faces)
 
   @staticmethod
   def _make_parallel(faces: list):
@@ -214,6 +258,19 @@ class FaceCollection:
       for face in self.parallel[direction]:
         print(f'Position {face.plane.pos_from_origin()}, {face}')
       print('------')
+
+  @withdividers
+  def display_pairwise_shadowing(self):
+    """Prints out the pairwise shadowing status."""
+    for direction in self.parallel:
+      print(f'Direction: {direction.coordinates}')
+      face_list = self.parallel[direction]
+      for i in range(len(face_list)-1):
+        print(face_list[i])
+        print(face_list[i+1])
+        print(face_list[i].shadow(face_list[i+1]))
+        print()
+      print()
   
 
 # ------Execution below.------
@@ -230,7 +287,7 @@ def main(precision, path, types, out=True):
 
   # Gets the planes and categorize by parallel.
   face_list = objects['advanced_face']
-  faces = FaceCollection([f for f in face_list])
+  faces = FaceCollection([f for f in face_list if type(f) == Face])
   
   # # NOTE: now here are three things we can do.
 
@@ -238,13 +295,17 @@ def main(precision, path, types, out=True):
   # display_all_objects(objects)
 
   # 2. Displays the planes.
-  faces.display_faces()
+  # faces.display_faces()
 
   # 3. Displays the pairwise distances.
   # planes.display_pairwise_distances()
 
+  # 4. Displays pairwise shadowing.
+  # faces.display_pairwise_shadowing()
+
   # Displaying read results when requested.
   if out:
-    STPFile.print_errors()
-    print(f"- Successfully read {len(objects['advanced_face'])} faces.")
+    design.print_face_stats()
+    design.print_errors()
+    print(f"- Successfully read {len(faces)} faces.")
 

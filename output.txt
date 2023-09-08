@@ -1,0 +1,49 @@
+== STEP Python Interface
+== Copyright (c) 1991-2023 by STEP Tools Inc.
+== All Rights Reserved
+
+Licensed To: STEP Python Industry Evaluation / STEP Tools, Inc.
+Licensed Until: Dec 31, 2023
+
+Start of Test
+Test: test1.stp
+plane: 24
+- Out of all faces, 6 are unreadable, with formats {'cylindrical_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 12 faces.
+
+Test: test2.stp
+plane: 28
+- Out of all faces, 15 are unreadable, with formats {'b_spline_surface_with_knots_and_rational_b_spline_surface', 'conical_surface', 'cylindrical_surface', 'toroidal_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 4 faces.
+
+Test: test3.stp
+plane: 35
+- Out of all faces, 18 are unreadable, with formats {'b_spline_surface_with_knots_and_rational_b_spline_surface', 'conical_surface', 'cylindrical_surface', 'toroidal_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 7 faces.
+
+Test: test4.stp
+plane: 39
+- Out of all faces, 27 are unreadable, with formats {'b_spline_surface_with_knots_and_rational_b_spline_surface', 'conical_surface', 'cylindrical_surface', 'toroidal_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 4 faces.
+
+Test: sample_surface.stp
+plane: 51
+- Out of all faces, 27 are unreadable, with formats {'b_spline_surface_with_knots_and_rational_b_spline_surface', 'conical_surface', 'cylindrical_surface', 'toroidal_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 12 faces.
+
+Test: hard.stp
+plane: 128
+- Out of all faces, 252 are unreadable, with formats {'b_spline_surface_with_knots_and_rational_b_spline_surface', 'conical_surface', 'spherical_surface', 'cylindrical_surface', 'toroidal_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 77 faces.
+
+Test: hud_shell.stp
+plane: 513
+- Out of all faces, 567 are unreadable, with formats {'surface_of_linear_extrusion', 'b_spline_surface_with_knots_and_rational_b_spline_surface', 'conical_surface', 'spherical_surface', 'cylindrical_surface', 'toroidal_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 385 faces.
+
+Test: surface.stp
+plane: 517
+- Out of all faces, 571 are unreadable, with formats {'surface_of_linear_extrusion', 'b_spline_surface_with_knots_and_rational_b_spline_surface', 'conical_surface', 'spherical_surface', 'cylindrical_surface', 'toroidal_surface', 'b_spline_surface_with_knots'}.
+- Successfully read 4 faces.
+
+End of Test
