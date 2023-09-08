@@ -3,7 +3,7 @@
 HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objects within STP files. It uses the `steptools` library for working with STP files, while enabling us to extract, categorize, and do numerical operations with 3D objects taken from the file.
 
 ### Definitions
-> The program is object oriented; it mimics the idea of these 3D objects in reality. Here are definitions for each and their design decisions.
+> The program is object oriented; it mimics the idea of these 3D objects in reality. I've written the definitions for each and their design decisions.
 - **Vector/Vertex**: a vector $v$ is a collection of $(x, y, z)$ points in the $\mathbb{R}^3$ space.
 	- It could be interpreted as an "arrow with direction and magnitude", or a "point" in a 3D space (which means vertex).
 - **Edge**: an edge $e$ is a tuple of $2$ vectors $(v_{\text{start}}, v_{\text{end}})$ representing an edge segment.
@@ -18,6 +18,7 @@ HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objec
 - **Face**: a face $F$ contains a bound $B$ and a plane $P$.
 
 ### Program Features
+> I include current program functionalities here.
 1. Reading all STP `advanced_faces` and converting them to `Face` objects.
 	- Encapsulates the `Plane` they are on, and the `Bound` they reside in.
 	- Requires these faces to be planar, not curved.
@@ -30,9 +31,9 @@ HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objec
 4. Displaying pairwise `Plane` distances.
 	- For sorted $\text{array}\langle P \rangle$ of length $n$ described above, the distance between consecutive $P_i$ and $P_{i+1}$ can be calculated.
 	- Moreover, $\min|p_{i}-p_{i+1}| \text{ for all } i < n$ yields a lower bound for the thickness of any "slab".
-1. Calculating the area of each `Face`.
+5. Calculating the area of each `Face`, for any shape.
 	- Any number of edges is fine — the classic polygon area problem.
-2. Detecting if `Face` overlap with each other.
+6. Detecting if `Face` overlap with each other.
 	- For two faces $F_1, F_2$, they overlap each other when, on the same axis, one can "project a shadow" onto the other.
 	- A formal definition would be that there exists points $p_1 \in F_1, p_2 \in F_2$ such that the edge $(p_1, p_2)$ is perpendicular to both $F_1$ and $F_2$.
 
