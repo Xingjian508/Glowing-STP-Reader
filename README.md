@@ -18,7 +18,7 @@ HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objec
 - **Face**: a face $F$ contains a bound $B$ and a plane $P$.
 
 ### Program Features
-> I include current program functionalities here.
+> I've included current program functionalities here. I'm still adding to them.
 1. Reading all STP `advanced_faces` and converting them to `Face` objects.
 	- Encapsulates the `Plane` they are on, and the `Bound` they reside in.
 	- Requires these faces to be planar, not curved.
@@ -58,6 +58,7 @@ HI EVERYONE! I wrote this program that allows us to analyze and explore 3D objec
 The usage of the program is labeled in the code, in detail. The prerequisites needed include Python3, and `steptools`.
 
 ### Code Maintenance and Improvement Ideas
+> I use this as a development plan for the future.
 1. **Enhance Thickness Calculation Method**: Instead of relying solely on distance, consider whether two parallel planes overlap each other on the same axis to determine their thickness (mentioned in "Program Features"). One can also examine the existence of other parallel planes and connect their "edges".
 	- For example, think of a can: the top and bottom are two parallel planes, and there's a side connecting the outer "edges" of both the top and bottom. In this scenario, we say there's "thickness".
 	- **This isn't difficult to implement on top of the existing program**. With a successful hash, it would only require $\text{O}(n)$ time complexity.
